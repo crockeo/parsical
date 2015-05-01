@@ -69,10 +69,6 @@ namespace parsical {
 
         // Stepping back some interval.
         virtual void stepBack(int) throw(ParseError) override;
-
-        // Un-getting a single character. It ought to be equivalent to
-        // stepBack(1)
-        virtual void unget() throw(ParseError) override;
     };
 }
 
