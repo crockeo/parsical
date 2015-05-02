@@ -4,9 +4,13 @@
 
 #include "../parsical/parsestream.hpp"
 #include "../parsical/parseerror.hpp"
+#include "../parsical/general.hpp"
 
 //////////
 // Code //
+
+////
+// parsestream.hpp
 
 // Testing out the string parser for a couple of functions.
 TEST_CASE("String Parser") {
@@ -23,4 +27,22 @@ TEST_CASE("String Parser") {
 
     REQUIRE(p.peek() == 'a');
     REQUIRE(p.peek() == 'a');
+}
+
+////
+// general.hpp
+
+// Attempting to perform a tryparse.
+TEST_CASE("tryParse") {
+    parsical::StringParser p("abcdefg");
+
+    REQUIRE(p.pos() == 0);
+
+    REQUIRE_THROWS(parsical::tryParse<char>(p, [](parsical::ParseStream<char>& stream) -> char {
+        char c = stream.get();
+        throw parsical::ParseError("Did the thing.");
+        return c;
+    }));
+
+    REQUIRE(p.pos() == 0);
 }
