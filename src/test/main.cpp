@@ -151,6 +151,11 @@ TEST_CASE("oneOf & noneOf") {
 TEST_CASE("many") {
     parsical::StringParser p("aaabcdeeeef");
 
+    std::vector<int> test0 { };
+    REQUIRE(parsical::many<int>(p, [](parsical::ParseStream<char>& c) -> int {
+        throw parsical::ParseError("nothing");
+    }) == test0);
+
     std::vector<int> test1 { 97, 97, 97 };
     REQUIRE(parsical::many<int>(p, [](parsical::ParseStream<char>& c) -> int {
         if (c.peek() != 'a')
@@ -165,4 +170,28 @@ TEST_CASE("many") {
     std::set<char> set { 'e', 'f' };
     std::vector<char> test2 { 'e', 'e', 'e', 'e', 'f' };
     REQUIRE(parsical::many<char>(p, std::bind(parsical::oneOf<char>, std::placeholders::_1, set)) == test2);
+}
+
+// Attempting to perform a manyOne.
+TEST_CASE("manyOne") {
+    parsical::StringParser p("aaabcdeeeef");
+
+    REQUIRE_THROWS(parsical::manyOne<int>(p, [](parsical::ParseStream<char>& c) -> int {
+        throw parsical::ParseError("nothing");
+    }));
+
+    std::vector<int> test1 { 97, 97, 97 };
+    REQUIRE(parsical::manyOne<int>(p, [](parsical::ParseStream<char>& c) -> int {
+        if (c.peek() != 'a')
+            throw parsical::ParseError("DONE");
+        return static_cast<int>(c.get());
+    }) == test1);
+
+    REQUIRE(p.get() == 'b');
+    REQUIRE(p.get() == 'c');
+    REQUIRE(p.get() == 'd');
+
+    std::set<char> set { 'e', 'f' };
+    std::vector<char> test2 { 'e', 'e', 'e', 'e', 'f' };
+    REQUIRE(parsical::manyOne<char>(p, std::bind(parsical::oneOf<char>, std::placeholders::_1, set)) == test2);
 }

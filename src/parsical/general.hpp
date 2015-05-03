@@ -68,6 +68,13 @@ namespace parsical {
               typename ParserType,
               typename FunctionType>
     std::vector<ReturnType> many(ParseStream<ParserType>&, FunctionType) throw(ParseError);
+
+    // Attempting to match many of a function on a parser. Will fail if no parses
+    // succeed.
+    template <typename ReturnType,
+              typename ParserType,
+              typename FunctionType>
+    std::vector<ReturnType> manyOne(ParseStream<ParserType>&, FunctionType) throw(ParseError);
 }
 
 #include "general.tpp"
