@@ -145,3 +145,24 @@ TEST_CASE("oneOf & noneOf") {
     REQUIRE(noneOf(p, set) == 'c');
     REQUIRE(noneOf(p, set) == 'd');
 }
+
+// Attempting to perform a many. First on a new function, and then by attempting
+// to bind an already-made parsing function.
+TEST_CASE("many") {
+    parsical::StringParser p("aaabcdeeeef");
+
+    std::vector<int> test1 { 97, 97, 97 };
+    REQUIRE(parsical::many<int>(p, [](parsical::ParseStream<char>& c) -> int {
+        if (c.peek() != 'a')
+            throw parsical::ParseError("DONE");
+        return static_cast<int>(c.get());
+    }) == test1);
+
+    REQUIRE(p.get() == 'b');
+    REQUIRE(p.get() == 'c');
+    REQUIRE(p.get() == 'd');
+
+    std::set<char> set { 'e', 'f' };
+    std::vector<char> test2 { 'e', 'e', 'e', 'e', 'f' };
+    REQUIRE(parsical::many<char>(p, std::bind(parsical::oneOf<char>, std::placeholders::_1, set)) == test2);
+}

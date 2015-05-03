@@ -62,6 +62,12 @@ namespace parsical {
     // previous position.
     template <typename ParserType>
     ParserType noneOf(ParseStream<ParserType>&, const std::set<ParserType>&) throw(ParseError);
+
+    // Attempting to match many of a function on a parser.
+    template <typename ReturnType,
+              typename ParserType,
+              typename FunctionType>
+    std::vector<ReturnType> many(ParseStream<ParserType>&, FunctionType) throw(ParseError);
 }
 
 #include "general.tpp"

@@ -81,3 +81,20 @@ ParserType parsical::noneOf(ParseStream<ParserType>& stream, const std::set<Pars
         throw parsical::ParseError("Value is in the set of inappropriate values.");
     return stream.get();
 }
+
+// Attempting to match many of a function on a parser.
+template <typename ReturnType,
+          typename ParserType,
+          typename FunctionType>
+std::vector<ReturnType> parsical::many(ParseStream<ParserType>& stream, FunctionType fn) throw(parsical::ParseError) {
+    std::vector<ReturnType> values;
+
+    bool good = true;
+    while (good) {
+        try {
+            values.push_back(fn(stream));
+        } catch (parsical::ParseError& e) { good = false; }
+    }
+
+    return values;
+}
