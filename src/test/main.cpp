@@ -1,5 +1,6 @@
 //////////////
 // Includes //
+#include <functional>
 #include <iostream>
 
 #include "catch.hpp"
@@ -55,10 +56,10 @@ TEST_CASE("StringParser") {
 
 // Testing out a file parser in a similar way.
 TEST_CASE("FileParser") {
-    parsical::FileParser p("res/testfile.txt", 5);
-    std::vector<char> values { 'a', 'b', 'c', 'd', 'e', 'f', 'g', '\n' };
+    //parsical::FileParser p("res/testfile.txt", 5);
+    //std::vector<char> values { 'a', 'b', 'c', 'd', 'e', 'f', 'g', '\n' };
 
-    testParser(p, values);
+    //testParser(p, values);
 }
 
 ////
@@ -77,4 +78,34 @@ TEST_CASE("tryParse") {
     }));
 
     REQUIRE(p.pos() == 0);
+}
+
+// Attempting to perform a takeWhile on a parser.
+TEST_CASE("takeWhile") {
+    parsical::StringParser p("aaabcdeeeef");
+
+    std::vector<char> testValues { 'a', 'a', 'a' };
+    REQUIRE(takeWhile(p, [](char c) -> bool { return c == 'a'; }) == testValues);
+
+    REQUIRE(p.get() == 'b');
+    REQUIRE(p.get() == 'c');
+    REQUIRE(p.get() == 'd');
+
+    std::vector<char> testValues2 { 'e', 'e', 'e', 'e', 'f' };
+    REQUIRE(takeWhile(p, [](char c) -> bool { return c == 'e' || c == 'f'; }) == testValues2);
+}
+
+// Attempting to perform a dropWhile on a parser.
+TEST_CASE("dropWhile") {
+    parsical::StringParser p("aaabcdeeeef");
+
+    dropWhile(p, [](char c) -> bool { return c == 'a'; });
+    
+    REQUIRE(p.get() == 'b');
+    REQUIRE(p.get() == 'c');
+    REQUIRE(p.get() == 'd');
+
+    dropWhile(p, [](char c) -> bool { return c == 'e' || c == 'f'; });
+
+    REQUIRE(p.eof());
 }
