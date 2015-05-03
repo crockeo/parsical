@@ -9,7 +9,8 @@
 
 //////////////
 // Includes //
-#include <istream>
+#include <exception>
+#include <fstream>
 #include <string>
 
 #include "parseerror.hpp"
@@ -69,6 +70,59 @@ namespace parsical {
 
         // Stepping back some interval.
         virtual void stepBack(int) throw(ParseError) override;
+    };
+
+    // A parser designed to parse files.
+    class FileParser : public ParseStream<char> {
+    private:
+        const int maxChunkSize;
+
+        int lastChunkSize, currChunkSize;
+        std::ifstream in;
+        int priorChunks;
+        char* chunk;
+        int p;
+
+        // Attempting to back up a chunk.
+        void backupChunk();
+
+        // Attempting to load the next chunk.
+        void loadNextChunk();
+
+    public:
+        const static int DEFAULT_CHUNK_SIZE = 512;
+
+        // Creating a FileParser from a path to a file and an alternate chunk
+        // size.
+        FileParser(std::string, int) throw(std::runtime_error);
+
+        // Creating a FileParser from a path to a file.
+        FileParser(std::string) throw(std::runtime_error);
+
+        // Deleting the copy constructor.
+        FileParser(const FileParser&) = delete;
+
+        // Closing up a file.
+        ~FileParser();
+
+        // Checking whether this ParseStream has reached its end.
+        virtual bool eof() const noexcept override;
+
+        // Peeking at the next value without consuming it.
+        virtual char peek() const throw(ParseError) override;
+
+        // Getting the current position in this ParseStream.
+        virtual int pos() const noexcept override;
+
+        // Consuming and returning a value.
+        virtual char get() throw(ParseError) override;
+
+        // Stepping back some interval.
+        virtual void stepBack(int) throw(ParseError) override;
+
+        // Un-getting a single character. It ought to be equivalent to
+        // stepBack(1)
+        virtual void unget() throw(ParseError) override;
     };
 }
 
