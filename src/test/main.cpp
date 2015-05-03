@@ -95,6 +95,14 @@ TEST_CASE("takeWhile") {
     REQUIRE(takeWhile(p, [](char c) -> bool { return c == 'e' || c == 'f'; }) == testValues2);
 }
 
+// Attemping to perform a takeUntil on a parser.
+TEST_CASE("takeUntil") {
+    parsical::StringParser p("aaabcdeeeef");
+
+    std::vector<char> testValues { 'a', 'a', 'a', 'b', 'c', 'd' };
+    REQUIRE(takeUntil(p, [](char c) -> bool { return c == 'e'; }) == testValues);
+}
+
 // Attempting to perform a dropWhile on a parser.
 TEST_CASE("dropWhile") {
     parsical::StringParser p("aaabcdeeeef");
@@ -108,4 +116,32 @@ TEST_CASE("dropWhile") {
     dropWhile(p, [](char c) -> bool { return c == 'e' || c == 'f'; });
 
     REQUIRE(p.eof());
+}
+
+// Attempting to perform a dropUntil on a parser.
+TEST_CASE("dropUntil") {
+    parsical::StringParser p("aaabcdeeeef");
+
+    dropUntil(p, [](char c) -> bool { return c == 'e'; });
+
+    REQUIRE(p.get() == 'e');
+    REQUIRE(p.get() == 'e');
+    REQUIRE(p.get() == 'e');
+    REQUIRE(p.get() == 'e');
+    REQUIRE(p.get() == 'f');
+}
+
+// Attempting to perform oneOf and noneOf operations on a parser.
+TEST_CASE("oneOf & noneOf") {
+    parsical::StringParser p("aaabcdeeeef");
+    std::set<char> set { 'a', 'e' };
+
+    REQUIRE(oneOf(p, set) == 'a');
+    REQUIRE(oneOf(p, set) == 'a');
+    REQUIRE_THROWS(noneOf(p, set));
+    REQUIRE(oneOf(p, set) == 'a');
+
+    REQUIRE(noneOf(p, set) == 'b');
+    REQUIRE(noneOf(p, set) == 'c');
+    REQUIRE(noneOf(p, set) == 'd');
 }

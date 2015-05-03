@@ -60,3 +60,24 @@ void parsical::dropUntil(ParseStream<ParserType>& stream, FunctionType fn) {
     while (!stream.eof() && !fn(stream.peek()))
         stream.get();
 }
+
+// Given a set of possible values, it attempts to match the next value in
+// the ParseStream. If it succeeds, it returns that value. If it fails it
+// returns a new value and backs up to its previous position.
+template <typename ParserType>
+ParserType parsical::oneOf(ParseStream<ParserType>& stream, const std::set<ParserType>& set) throw(parsical::ParseError) {
+    if (set.find(stream.peek()) == set.end())
+        throw parsical::ParseError("Value is not in the set of appropriate values.");
+    return stream.get();
+}
+
+// Given a set of possible values, it attempts to match the next value in
+// the ParseStream. If it is not in the set, it succeeds, and it returns
+// that value. If it fails it returns a new value and backs up to its
+// previous position.
+template <typename ParserType>
+ParserType parsical::noneOf(ParseStream<ParserType>& stream, const std::set<ParserType>& set) throw(parsical::ParseError) {
+    if (set.find(stream.peek()) != set.end())
+        throw parsical::ParseError("Value is in the set of inappropriate values.");
+    return stream.get();
+}

@@ -31,7 +31,7 @@ namespace parsical {
               typename FunctionType>
     std::vector<ParserType> takeWhile(ParseStream<ParserType>&, FunctionType);
 
-    // The inerse of takeWhile - so long as a predicate is not true, it will
+    // The inverse of takeWhile - so long as a predicate is not true, it will
     // take a new value.
     template <typename ParserType,
               typename FunctionType>
@@ -44,11 +44,24 @@ namespace parsical {
               typename FunctionType>
     void dropWhile(ParseStream<ParserType>&, FunctionType);
 
-    // The inerse of dropWhile - so long as a predicate is not true, it will
+    // The inverse of dropWhile - so long as a predicate is not true, it will
     // drop new values.
     template <typename ParserType,
               typename FunctionType>
     void dropUntil(ParseStream<ParserType>&, FunctionType);
+
+    // Given a set of possible values, it attempts to match the next value in
+    // the ParseStream. If it succeeds, it returns that value. If it fails it
+    // returns a new value and backs up to its previous position.
+    template <typename ParserType>
+    ParserType oneOf(ParseStream<ParserType>&, const std::set<ParserType>&) throw(ParseError);
+
+    // Given a set of possible values, it attempts to match the next value in
+    // the ParseStream. If it is not in the set, it succeeds, and it returns
+    // that value. If it fails it returns a new value and backs up to its
+    // previous position.
+    template <typename ParserType>
+    ParserType noneOf(ParseStream<ParserType>&, const std::set<ParserType>&) throw(ParseError);
 }
 
 #include "general.tpp"
