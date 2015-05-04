@@ -78,6 +78,16 @@ TEST_CASE("tryParse") {
     }));
 
     REQUIRE(p.pos() == 0);
+
+    REQUIRE_THROWS(parsical::tryParse<std::vector<char>>(p, [](parsical::ParseStream<char>& stream) -> std::vector<char> {
+        return parsical::manyOne<char>(stream, [](parsical::ParseStream<char>& stream) -> char {
+            char c = stream.get();
+            throw parsical::ParseError("Did the thing a second time.");
+            return c;
+        });
+    }));
+
+    REQUIRE(p.pos() == 0);
 }
 
 // Attempting to perform a takeWhile on a parser.
