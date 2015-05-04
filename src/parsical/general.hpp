@@ -75,6 +75,14 @@ namespace parsical {
               typename ParserType,
               typename FunctionType>
     std::vector<ReturnType> manyOne(ParseStream<ParserType>&, FunctionType) throw(ParseError);
+
+    // Option takes a series of possible functions. It returns the value of the
+    // first successful parse. If nothing is successfully parsed - the stream
+    // consumes no input.
+    template <typename ReturnType,
+              typename ParserType,
+              typename FunctionType>
+    ReturnType option(ParseStream<ParserType>&, std::vector<FunctionType>) throw(ParseError);
 }
 
 #include "general.tpp"

@@ -205,3 +205,35 @@ TEST_CASE("manyOne") {
     std::vector<char> test2 { 'e', 'e', 'e', 'e', 'f' };
     REQUIRE(parsical::manyOne<char>(p, std::bind(parsical::oneOf<char>, std::placeholders::_1, set)) == test2);
 }
+
+// Attempting to perform an option.
+TEST_CASE("option") {
+    parsical::StringParser p("aaabcdeeeef");
+
+    // Creating a comparisong function.
+    auto makeFn = [](char comp) -> std::function<char(parsical::ParseStream<char>&)> {
+        return [=](parsical::ParseStream<char>& stream) -> char {
+            char c = stream.get();
+            if (c != comp)
+                throw parsical::ParseError();
+            return c;
+        };
+    };
+
+    // Creating a series of functions.
+    std::vector<std::function<char(parsical::ParseStream<char>&)>> fns {
+        makeFn('a'),
+        makeFn('b'),
+        makeFn('c')
+    };
+
+    REQUIRE(parsical::option<char>(p, fns) == 'a');
+    REQUIRE(parsical::option<char>(p, fns) == 'a');
+    REQUIRE(parsical::option<char>(p, fns) == 'a');
+    REQUIRE(parsical::option<char>(p, fns) == 'b');
+    REQUIRE(parsical::option<char>(p, fns) == 'c');
+
+    int pos = p.pos();
+    REQUIRE_THROWS(parsical::option<char>(p, fns));
+    REQUIRE(pos == p.pos());
+}

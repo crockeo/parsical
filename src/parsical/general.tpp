@@ -110,3 +110,18 @@ std::vector<ReturnType> parsical::manyOne(parsical::ParseStream<ParserType>& str
         throw parsical::ParseError("manyOne: no parses succeeded.");
     return values;
 }
+
+// Option takes a series of possible functions. It returns the value of the
+// first successful parse. If nothing is successfully parsed - the stream
+// consumes no input.
+template <typename ReturnType,
+          typename ParserType,
+          typename FunctionType>
+ReturnType parsical::option(parsical::ParseStream<ParserType>& stream, std::vector<FunctionType> fns) throw(parsical::ParseError) {
+    for (FunctionType fn: fns) {
+        try { return tryParse<ReturnType>(stream, fn); }
+        catch (parsical::ParseError& e) { }
+    }
+
+    throw parsical::ParseError("option: no function matched.");
+}
