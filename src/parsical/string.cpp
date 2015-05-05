@@ -43,3 +43,24 @@ std::string parsical::str::takeUntil(parsical::ParseStream<char>& stream, std::f
 
     return builder.str();
 }
+
+// Attempting to parse a bool out of a ParseStream. Does not consume any input
+// upon failure.
+bool parsical::str::parseBool(parsical::ParseStream<char>& stream) throw(parsical::ParseError) {
+    std::string str;
+
+    std::vector<std::function<std::string(parsical::ParseStream<char>&)>> fns {
+        std::bind(parsical::str::string, std::placeholders::_1, "true"),
+        std::bind(parsical::str::string, std::placeholders::_1, "false")
+    };
+
+    try {
+        str = parsical::option<std::string>(stream, fns);
+    } catch (parsical::ParseError& e) {
+        throw parsical::ParseError("Neither \"true\" nor \"false\" could be matched.");
+    }
+
+    if (str == "true")
+        return true;
+    return false;
+}

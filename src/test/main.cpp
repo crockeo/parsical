@@ -277,3 +277,14 @@ TEST_CASE("str::takeUntil") {
     REQUIRE(parsical::str::takeUntil(p, [](char c) -> bool { return c == 'f'; }) == "aaabcdeeee");
     REQUIRE(parsical::str::takeUntil(p, [](char c) -> bool { return c == '\0'; }) == "f");
 }
+
+// Testing the parseBool function.
+TEST_CASE("parseBool") {
+    parsical::StringParser p("atruefalse");
+
+    REQUIRE_THROWS(parsical::str::parseBool(p));
+    p.get();
+
+    REQUIRE(parsical::str::parseBool(p) == true);
+    REQUIRE(parsical::str::parseBool(p) == false);
+}

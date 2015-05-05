@@ -34,6 +34,12 @@ namespace parsical {
         // A version of takeUntil that returns a std::string instead of a vector
         // of characters.
         std::string takeUntil(parsical::ParseStream<char>&, std::function<bool(char)>);
+
+        // Attempting to parse a bool out of a ParseStream.
+        bool parseBool(parsical::ParseStream<char>&) throw(ParseError);
+
+        //////////////////////////////////////////////////////////////////////
+        // THIS SECTION DOWN IS IN NEED OF TEST CASES - DO THE CODING THING //
     }
 }
 
