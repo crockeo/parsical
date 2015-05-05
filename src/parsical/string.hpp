@@ -38,8 +38,13 @@ namespace parsical {
         // Attempting to parse a bool out of a ParseStream.
         bool parseBool(parsical::ParseStream<char>&) throw(ParseError);
 
-        //////////////////////////////////////////////////////////////////////
-        // THIS SECTION DOWN IS IN NEED OF TEST CASES - DO THE CODING THING //
+        // A set of basic functions to infer properties about specific characters.
+        bool isWhitespace(char);
+        bool isNumber(char);
+        bool isUppercase(char);
+        bool isLowercase(char);
+        bool isAlpha(char);
+        bool isAlphaNum(char);
     }
 }
 

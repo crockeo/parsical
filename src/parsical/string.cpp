@@ -64,3 +64,11 @@ bool parsical::str::parseBool(parsical::ParseStream<char>& stream) throw(parsica
         return true;
     return false;
 }
+
+// A set of basic functions to infer properties about specific characters.
+bool parsical::str::isWhitespace(char c) { return c == ' ' || c == '\t' || c == '\n' || c == '\r'; }
+bool parsical::str::isNumber    (char c) { return c >= '0' && c <= '9'; }
+bool parsical::str::isUppercase (char c) { return c >= 'A' && c <= 'Z'; }
+bool parsical::str::isLowercase (char c) { return c >= 'a' && c <= 'z'; }
+bool parsical::str::isAlpha     (char c) { return isUppercase(c) || isLowercase(c); }
+bool parsical::str::isAlphaNum  (char c) { return isNumber(c) || isAlpha(c); }

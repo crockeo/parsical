@@ -288,3 +288,36 @@ TEST_CASE("parseBool") {
     REQUIRE(parsical::str::parseBool(p) == true);
     REQUIRE(parsical::str::parseBool(p) == false);
 }
+
+// Testing the various is____(char) functions.
+TEST_CASE("isChar") {
+    using namespace parsical::str;
+
+    // Testing isWhitespace.
+    REQUIRE(isWhitespace(' '));
+    REQUIRE(isWhitespace('\t'));
+    REQUIRE(isWhitespace('\n'));
+    REQUIRE(isWhitespace('\r'));
+    REQUIRE(!isWhitespace('a'));
+    REQUIRE(!isWhitespace('\0'));
+
+    // Testing isNumber.
+    for (char c = '0'; c <= '9'; c++) {
+        REQUIRE(isNumber(c));
+        REQUIRE(isAlphaNum(c));
+    }
+
+    // Testing isUppercase
+    for (char c = 'A'; c <= 'Z'; c++) {
+        REQUIRE(isUppercase(c));
+        REQUIRE(isAlpha(c));
+        REQUIRE(isAlphaNum(c));
+    }
+
+    // Testing isLowercase
+    for (char c = 'a'; c <= 'z'; c++) {
+        REQUIRE(isLowercase(c));
+        REQUIRE(isAlpha(c));
+        REQUIRE(isAlphaNum(c));
+    }
+}
