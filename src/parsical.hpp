@@ -11,5 +11,6 @@
 #include "parsical/parsestream.hpp"
 #include "parsical/parseerror.hpp"
 #include "parsical/general.hpp"
+#include "parsical/string.hpp"
 
 #endif

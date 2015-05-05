@@ -235,3 +235,45 @@ TEST_CASE("option") {
     REQUIRE_THROWS(parsical::option<char>(p, fns));
     REQUIRE(pos == p.pos());
 }
+
+////
+// string.hpp
+
+// Testing the parsical::str::string function.
+TEST_CASE("string") {
+    parsical::StringParser p("aaabcdeeeef");
+
+    REQUIRE(parsical::str::string(p, "aaabcd") == "aaabcd");
+    REQUIRE_THROWS(parsical::tryParse<std::string>(p, std::bind(parsical::str::string, std::placeholders::_1, "eef")));
+    REQUIRE_THROWS(parsical::str::string(p, "eeeea"));
+    REQUIRE(p.get() == 'f');
+}
+
+// Testing the str::takeWhile function.
+TEST_CASE("str::takeWhile") {
+    parsical::StringParser p("aaabcdeeeef");
+
+    REQUIRE(parsical::str::takeWhile(p, [](char c) -> bool { return c == 'a'; }) == "aaa");
+    REQUIRE(parsical::str::takeWhile(p, [](char c) -> bool { return c == 'a'; }) == "");
+    REQUIRE(parsical::str::takeWhile(p, [](char c) -> bool {
+        switch (c) {
+        case 'b':
+        case 'c':
+        case 'd':
+        case 'e':
+        case 'f':
+            return true;
+        default:
+            return false;
+        }
+    }) == "bcdeeeef");
+}
+
+// Testing the str::takeUntil function.
+TEST_CASE("str::takeUntil") {
+    parsical::StringParser p("aaabcdeeeef");
+
+    REQUIRE(parsical::str::takeUntil(p, [](char c) -> bool { return c == 'a'; }) == "");
+    REQUIRE(parsical::str::takeUntil(p, [](char c) -> bool { return c == 'f'; }) == "aaabcdeeee");
+    REQUIRE(parsical::str::takeUntil(p, [](char c) -> bool { return c == '\0'; }) == "f");
+}

@@ -10,6 +10,7 @@ set(CMAKE_CXX_FLAGS "-Wall -O2 -std=c++11 ${CMAKE_CXX_FLAGS}")
 set(SOURCES
   src/parsical/parsestream.cpp
   src/parsical/parseerror.cpp
+  src/parsical/string.cpp
 )
 
 add_library(parsical STATIC ${SOURCES})

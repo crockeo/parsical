@@ -9,6 +9,7 @@
 //////////////
 // Includes //
 #include <vector>
+#include <set>
 
 #include "parsestream.hpp"
 #include "parseerror.hpp"
