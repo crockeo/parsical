@@ -21,6 +21,9 @@ find_library(PARSICAL_LIBRARY
   PATHS ${SERACH_DIRECTORIES}
 )
 
+set(PARSICAL_INCLUDE_DIRS ${PARSICAL_INCLUDE_DIR})
+set(PARSICAL_LIBRARIES ${PARSICAL_LIBRARIES})
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
   CLIBGAME

@@ -16,9 +16,12 @@
 // A generic testing operation for a given implementation of a ParseStream.
 template <typename T>
 void testParser(parsical::ParseStream<T>& p, std::vector<T> values) {
+    std::cout << "---" << std::endl;
     // Consuming all of the characters that ought to be in the test file.
-    for (T t: values)
+    for (T t: values) {
+        std::cout << p.peek() << std::endl;
         REQUIRE(p.get() == t);
+    }
 
     // Checking that the stream is indeed empty.
     REQUIRE(p.eof());
@@ -54,10 +57,10 @@ TEST_CASE("StringParser") {
 
 // Testing out a file parser in a similar way.
 TEST_CASE("FileParser") {
-    //parsical::FileParser p("res/testfile.txt", 5);
-    //std::vector<char> values { 'a', 'b', 'c', 'd', 'e', 'f', 'g', '\n' };
+    parsical::IStreamParser p("res/testfile.txt");
+    std::vector<char> values { 'a', 'b', 'c', 'd', 'e', 'f', 'g', '\n' };
 
-    //testParser(p, values);
+    testParser(p, values);
 }
 
 ////

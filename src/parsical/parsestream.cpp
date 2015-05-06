@@ -38,95 +38,78 @@ void parsical::StringParser::stepBack(int n) throw(parsical::ParseError) {
 }
 
 ////
-// FileParser
+// IStreamParser
 
-// Attempting to back up a chunk.
-void parsical::FileParser::backupChunk() {
-    for (int i = 0; i < lastChunkSize; i++)
-        in.unget();
+// Creating an IStreamParser from a r-value reference istream.
+parsical::IStreamParser::IStreamParser(std::istream&& in) throw(std::runtime_error) :
+        in(in) {
+    if (!in.good())
+        throw std::runtime_error("Input stream is not good.");
 
-    priorChunks -= 2;
-    currChunkSize = maxChunkSize;
+    // TODO: I think I might be running into some problems where the
+    // std::istream&& is losing scope and therefore being automatically removed
+    // before I want it to be. Therefore when I call it outside of this
+    // constructor (and the rvalue reference is gone), it segfaults.
 
-    loadNextChunk();
+    next = '\0';
+    p = -1;
+    get();
 }
 
-// Attempting to load the next chunk.
-void parsical::FileParser::loadNextChunk() {
-    in.get(chunk, maxChunkSize + 1, '\0');
+// Creating an IStreamParser from an l-value reference istream.
+parsical::IStreamParser::IStreamParser(std::istream& in) throw(std::runtime_error) :
+        in(in) {
+    if (!in.good())
+        throw std::runtime_error("Input stream is not good.");
 
-    lastChunkSize = currChunkSize;
-    currChunkSize = in.gcount();
-
-    priorChunks++;
+    next = '\0';
+    p = -1;
+    get();
 }
 
-// Creating a FileParser from a path to a file and an alternate chunk
-// size.
-parsical::FileParser::FileParser(std::string path, int maxChunkSize) throw(std::runtime_error) :
-        maxChunkSize(maxChunkSize),
-        in(path) {
-    currChunkSize = -1;
-    priorChunks = -1;
-    chunk = new char[maxChunkSize + 1];
-    p = 0;
-
-    loadNextChunk();
-}
-
-// Creating a FileParser from a path to a file.
-parsical::FileParser::FileParser(std::string path) throw(std::runtime_error) :
-        parsical::FileParser(path, parsical::FileParser::DEFAULT_CHUNK_SIZE) { }
-
-// Closing up a file.
-parsical::FileParser::~FileParser() {
-    in.close();
-    delete chunk;
-}
+// Creating an IStreamParser from a path to a file on the filesystem.
+parsical::IStreamParser::IStreamParser(std::string path) throw(std::runtime_error) :
+        parsical::IStreamParser(std::ifstream(path)) { }
 
 // Checking whether this ParseStream has reached its end.
-bool parsical::FileParser::eof() const noexcept {
-    return (p % maxChunkSize == 0 || p % maxChunkSize == currChunkSize) && p != 0 && in.eof();
-}
+bool parsical::IStreamParser::eof() const noexcept { return in.eof(); }
 
-// Peeking at the next value without consuming iint parsical::FileParser::peek() const throw(parsical::ParseError) {
-char parsical::FileParser::peek() const throw(parsical::ParseError) {
+// Peeking at the next value without consuming it.
+char parsical::IStreamParser::peek() const throw(parsical::ParseError) {
     if (eof())
-        throw parsical::ParseError("Cannot peek after the input stream has been exhausted.");
-    return chunk[p % maxChunkSize];
+        throw ParseError();
+    return next;
 }
 
 // Getting the current position in this ParseStream.
-int parsical::FileParser::pos() const noexcept { return p; }
+int parsical::IStreamParser::pos() const noexcept { return p; }
 
 // Consuming and returning a value.
-char parsical::FileParser::get() throw(parsical::ParseError) {
-    if (eof())
-        throw parsical::ParseError("Cannot get after the input stream has been exhausted.");
+char parsical::IStreamParser::get() throw(parsical::ParseError) {
+    if (next != '\0')
+        gotten.push(next);
+    in.get(next);
+    p++;
 
-    if (p != 0 && p % maxChunkSize == 0)
-        loadNextChunk();
-
-    return chunk[p++ % maxChunkSize];
+    return gotten.top();
 }
 
 // Stepping back some interval.
-void parsical::FileParser::stepBack(int n) throw(parsical::ParseError) {
-    if (n > p)
+void parsical::IStreamParser::stepBack(int n) throw(parsical::ParseError) {
+    if (n > pos())
         throw parsical::ParseError("Stepping back so far would make the current position negative.");
-
-    while (p - n < priorChunks * maxChunkSize)
-        backupChunk();
-
-    p -= n;
-    if (p <= 0)
-        lastChunkSize = -1;
+    for (int i = 0; i < n; i++)
+        unget();
 }
 
 // Un-getting a single character. It ought to be equivalent to
 // stepBack(1)
-void parsical::FileParser::unget() throw(parsical::ParseError) {
-    if (pos() <= 0)
-        throw parsical::ParseError("Cannot unget after ");
-    p -= 1;
+void parsical::IStreamParser::unget() throw(parsical::ParseError) {
+    if (p <= 0)
+        throw ParseError("Ungetting would make the current position negative.");
+
+    in.putback(next);
+    next = gotten.top();
+    gotten.pop();
+    p--;
 }

@@ -12,6 +12,7 @@
 #include <exception>
 #include <fstream>
 #include <string>
+#include <stack>
 
 #include "parseerror.hpp"
 
@@ -72,38 +73,23 @@ namespace parsical {
         virtual void stepBack(int) throw(ParseError) override;
     };
 
-    // A parser designed to parse files.
-    class FileParser : public ParseStream<char> {
+    // A parser designed to work on std::istreams.
+    class IStreamParser : public ParseStream<char> {
     private:
-        const int maxChunkSize;
-
-        int lastChunkSize, currChunkSize;
-        std::ifstream in;
-        int priorChunks;
-        char* chunk;
+        std::stack<char> gotten;
+        std::istream& in;
+        char next;
         int p;
 
-        // Attempting to back up a chunk.
-        void backupChunk();
-
-        // Attempting to load the next chunk.
-        void loadNextChunk();
-
     public:
-        const static int DEFAULT_CHUNK_SIZE = 512;
+        // Creating an IStreamParser from a r-value reference istream.
+        IStreamParser(std::istream&&) throw(std::runtime_error);
 
-        // Creating a FileParser from a path to a file and an alternate chunk
-        // size.
-        FileParser(std::string, int) throw(std::runtime_error);
+        // Creating an IStreamParser from an l-value reference istream.
+        IStreamParser(std::istream&) throw(std::runtime_error);
 
-        // Creating a FileParser from a path to a file.
-        FileParser(std::string) throw(std::runtime_error);
-
-        // Deleting the copy constructor.
-        FileParser(const FileParser&) = delete;
-
-        // Closing up a file.
-        ~FileParser();
+        // Creating an IStreamParser from a path to a file on the filesystem.
+        IStreamParser(std::string) throw(std::runtime_error);
 
         // Checking whether this ParseStream has reached its end.
         virtual bool eof() const noexcept override;
