@@ -77,19 +77,22 @@ namespace parsical {
     class IStreamParser : public ParseStream<char> {
     private:
         std::stack<char> gotten;
-        std::istream& in;
+        std::istream* in;
         char next;
         int p;
 
     public:
-        // Creating an IStreamParser from a r-value reference istream.
-        IStreamParser(std::istream&&) throw(std::runtime_error);
+        // Creating an IStreamParser from a pointer to a std::istream.
+        IStreamParser(std::istream*) throw(std::runtime_error);
 
         // Creating an IStreamParser from an l-value reference istream.
         IStreamParser(std::istream&) throw(std::runtime_error);
 
         // Creating an IStreamParser from a path to a file on the filesystem.
         IStreamParser(std::string) throw(std::runtime_error);
+
+        // Cleaning up after this parser.
+        ~IStreamParser();
 
         // Checking whether this ParseStream has reached its end.
         virtual bool eof() const noexcept override;

@@ -40,44 +40,36 @@ void parsical::StringParser::stepBack(int n) throw(parsical::ParseError) {
 ////
 // IStreamParser
 
-// Creating an IStreamParser from a r-value reference istream.
-parsical::IStreamParser::IStreamParser(std::istream&& in) throw(std::runtime_error) :
-        in(in) {
-    if (!in.good())
+// Creating an IStreamParser from a pointer to a std::istream.
+parsical::IStreamParser::IStreamParser(std::istream* in) throw(std::runtime_error) {
+    if (!in->good())
         throw std::runtime_error("Input stream is not good.");
 
-    // TODO: I think I might be running into some problems where the
-    // std::istream&& is losing scope and therefore being automatically removed
-    // before I want it to be. Therefore when I call it outside of this
-    // constructor (and the rvalue reference is gone), it segfaults.
-
-    next = '\0';
-    p = -1;
-    get();
+    this->in = in;
+    in->get(next);
+    p = 0;
 }
 
 // Creating an IStreamParser from an l-value reference istream.
 parsical::IStreamParser::IStreamParser(std::istream& in) throw(std::runtime_error) :
-        in(in) {
-    if (!in.good())
-        throw std::runtime_error("Input stream is not good.");
-
-    next = '\0';
-    p = -1;
-    get();
-}
+        parsical::IStreamParser(&in) { }
 
 // Creating an IStreamParser from a path to a file on the filesystem.
 parsical::IStreamParser::IStreamParser(std::string path) throw(std::runtime_error) :
-        parsical::IStreamParser(std::ifstream(path)) { }
+        parsical::IStreamParser(new std::ifstream(path)) { }
+
+// Cleaning up after this parser.
+parsical::IStreamParser::~IStreamParser() {
+    delete in;
+}
 
 // Checking whether this ParseStream has reached its end.
-bool parsical::IStreamParser::eof() const noexcept { return in.eof(); }
+bool parsical::IStreamParser::eof() const noexcept { return in->eof(); }
 
 // Peeking at the next value without consuming it.
 char parsical::IStreamParser::peek() const throw(parsical::ParseError) {
     if (eof())
-        throw ParseError();
+        throw parsical::ParseError("Cannot peek after EOF has been reached.");
     return next;
 }
 
@@ -86,9 +78,10 @@ int parsical::IStreamParser::pos() const noexcept { return p; }
 
 // Consuming and returning a value.
 char parsical::IStreamParser::get() throw(parsical::ParseError) {
-    if (next != '\0')
-        gotten.push(next);
-    in.get(next);
+    if (eof())
+        throw parsical::ParseError("Cannot peek after EOF has been reached.");
+    gotten.push(next);
+    in->get(next);
     p++;
 
     return gotten.top();
@@ -108,7 +101,7 @@ void parsical::IStreamParser::unget() throw(parsical::ParseError) {
     if (p <= 0)
         throw ParseError("Ungetting would make the current position negative.");
 
-    in.putback(next);
+    in->putback(next);
     next = gotten.top();
     gotten.pop();
     p--;
