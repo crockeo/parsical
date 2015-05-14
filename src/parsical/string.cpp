@@ -44,6 +44,16 @@ std::string parsical::str::takeUntil(parsical::ParseStream<char>& stream, std::f
     return builder.str();
 }
 
+// Consuming input until either whitespace or the end of file is
+// reached. Throws an error if nothing is consumed.
+std::string parsical::str::parseString(parsical::ParseStream<char>& stream) throw(parsical::ParseError) {
+    std::string str = parsical::str::takeUntil(stream, isWhitespace);
+    if (str == "")
+        throw parsical::ParseError("Expected some input.");
+
+    return str;
+}
+
 // Consuming all whitespace from the current position until the
 // whitespace stops.
 void parsical::str::consumeWhitespace(parsical::ParseStream<char>& stream) {

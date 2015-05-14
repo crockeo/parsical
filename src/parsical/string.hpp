@@ -25,31 +25,35 @@ namespace parsical {
         // amount of consumed input is equivalent to that of the portion of the
         // matched string. A string that matches on 3 characters, but not the
         // 4th will consume 3 characters in the ParseStream.
-        std::string string(parsical::ParseStream<char>&, std::string) throw(ParseError);
+        std::string string(ParseStream<char>&, std::string) throw(ParseError);
 
         // A version of takeWhile that returns a std::string instead of a vector
         // of characters.
-        std::string takeWhile(parsical::ParseStream<char>&, std::function<bool(char)>);
+        std::string takeWhile(ParseStream<char>&, std::function<bool(char)>);
 
         // A version of takeUntil that returns a std::string instead of a vector
         // of characters.
-        std::string takeUntil(parsical::ParseStream<char>&, std::function<bool(char)>);
+        std::string takeUntil(ParseStream<char>&, std::function<bool(char)>);
+
+        // Consuming input until either whitespace or the end of file is
+        // reached. Throws an error if nothing is consumed.
+        std::string parseString(ParseStream<char>&) throw(ParseError);
 
         // Consuming all whitespace from the current position until the
         // whitespace stops.
-        void consumeWhitespace(parsical::ParseStream<char>&);
+        void consumeWhitespace(ParseStream<char>&);
 
         // Attempting to parse a bool out of a ParseStream. Does not consume any
         // input upon failure.
-        bool parseBool(parsical::ParseStream<char>&) throw(ParseError);
+        bool parseBool(ParseStream<char>&) throw(ParseError);
 
         // Attempting to parse a single digit out of a ParseStream. Does not
         // consume any input upon failure.
-        int parseDigit(parsical::ParseStream<char>&) throw(ParseError);
+        int parseDigit(ParseStream<char>&) throw(ParseError);
 
         // Attempting to parse out an entire int - either positive or negative.
         // Does not consume any input upon failure.
-        int parseInt(parsical::ParseStream<char>&) throw(ParseError);
+        int parseInt(ParseStream<char>&) throw(ParseError);
 
         // A set of basic functions to infer properties about specific characters.
         bool isWhitespace(char);

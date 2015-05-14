@@ -315,6 +315,19 @@ TEST_CASE("parseDigit") {
         REQUIRE(parsical::str::parseDigit(p) == i);
 }
 
+TEST_CASE("parseString") {
+    parsical::StringParser p("testing some stuff");
+
+    REQUIRE(parsical::str::parseString(p) == "testing");
+    REQUIRE_THROWS(parsical::str::parseString(p));
+    parsical::str::consumeWhitespace(p);
+
+    REQUIRE(parsical::str::parseString(p) == "some");
+    parsical::str::consumeWhitespace(p);
+
+    REQUIRE(parsical::str::parseString(p) == "stuff");
+}
+
 // Testing the parseInt function.
 TEST_CASE("parseInt") {
     parsical::StringParser first("-");
