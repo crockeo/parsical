@@ -16,12 +16,9 @@
 // A generic testing operation for a given implementation of a ParseStream.
 template <typename T>
 void testParser(parsical::ParseStream<T>& p, std::vector<T> values) {
-    std::cout << "---" << std::endl;
     // Consuming all of the characters that ought to be in the test file.
-    for (T t: values) {
-        std::cout << p.peek() << std::endl;
+    for (T t: values)
         REQUIRE(p.get() == t);
-    }
 
     // Checking that the stream is indeed empty.
     REQUIRE(p.eof());
@@ -281,6 +278,15 @@ TEST_CASE("str::takeUntil") {
     REQUIRE(parsical::str::takeUntil(p, [](char c) -> bool { return c == '\0'; }) == "f");
 }
 
+// Testing the consumeWhitespace function.
+TEST_CASE("consumeWhitespace") {
+    parsical::StringParser p("aaabc \t\r\n ajlad");
+
+    REQUIRE(parsical::str::takeWhile(p, parsical::str::isAlpha) == "aaabc");
+    parsical::str::consumeWhitespace(p);
+    REQUIRE(parsical::str::takeWhile(p, parsical::str::isAlpha) == "ajlad");
+}
+
 // Testing the parseBool function.
 TEST_CASE("parseBool") {
     parsical::StringParser p("atruefalse");
@@ -291,6 +297,45 @@ TEST_CASE("parseBool") {
     REQUIRE(parsical::str::parseBool(p) == true);
     REQUIRE(parsical::str::parseBool(p) == false);
 }
+
+// Testing the parseDigit function.
+TEST_CASE("parseDigit") {
+    parsical::StringParser p("a1234 5678");
+
+    REQUIRE_THROWS(parsical::str::parseDigit(p));
+    p.get();
+
+    for (int i = 1; i <= 4; i++)
+        REQUIRE(parsical::str::parseDigit(p) == i);
+
+    REQUIRE_THROWS(parsical::str::parseDigit(p));
+    p.get();
+
+    for (int i = 5; i <= 8; i++)
+        REQUIRE(parsical::str::parseDigit(p) == i);
+}
+
+// Testing the parseInt function.
+TEST_CASE("parseInt") {
+    parsical::StringParser first("-");
+    REQUIRE_THROWS(parsical::str::parseInt(first));
+    REQUIRE(first.get() == '-');
+
+    parsical::StringParser second("1234");
+    REQUIRE(parsical::str::parseInt(second) == 1234);
+    REQUIRE(second.eof());
+
+    parsical::StringParser third("-1234");
+    REQUIRE(parsical::str::parseInt(third) == -1234);
+    REQUIRE(third.eof());
+
+    parsical::StringParser fourth("1234 -1234");
+    REQUIRE(parsical::str::parseInt(fourth) == 1234);
+    REQUIRE_THROWS(parsical::str::parseInt(fourth));
+    fourth.get();
+    REQUIRE(parsical::str::parseInt(fourth) == -1234);
+}
+
 
 // Testing the various is____(char) functions.
 TEST_CASE("isChar") {

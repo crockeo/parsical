@@ -44,8 +44,14 @@ std::string parsical::str::takeUntil(parsical::ParseStream<char>& stream, std::f
     return builder.str();
 }
 
-// Attempting to parse a bool out of a ParseStream. Does not consume any input
-// upon failure.
+// Consuming all whitespace from the current position until the
+// whitespace stops.
+void parsical::str::consumeWhitespace(parsical::ParseStream<char>& stream) {
+    parsical::dropWhile(stream, isWhitespace);
+}
+
+// Attempting to parse a bool out of a ParseStream. Does not consume any
+// input upon failure.
 bool parsical::str::parseBool(parsical::ParseStream<char>& stream) throw(parsical::ParseError) {
     std::string str;
 
@@ -63,6 +69,43 @@ bool parsical::str::parseBool(parsical::ParseStream<char>& stream) throw(parsica
     if (str == "true")
         return true;
     return false;
+}
+
+// Attempting to parse a single digit out of a ParseStream. Does not
+// consume any input upon failure.
+int parsical::str::parseDigit(parsical::ParseStream<char>& stream) throw(parsical::ParseError) {
+    if (!parsical::str::isNumber(stream.peek()))
+        throw parsical::ParseError("");
+
+    return (int)(stream.get() - '0');
+}
+
+// Attempting to parse out an entire int - either positive or negative.
+// Does not consume any input upon failure.
+int parsical::str::parseInt(parsical::ParseStream<char>& stream) throw(parsical::ParseError) {
+    return parsical::tryParse<int>(stream, [](parsical::ParseStream<char>& stream) -> int {
+        int sign = 1;
+        if (stream.peek() == '-') {
+            sign = -1;
+            stream.get();
+        }
+
+        if (!parsical::str::isNumber(stream.peek()))
+            throw parsical::ParseError("Expected a number.");
+
+        int sum = 0;
+        while (true) {
+            try {
+                sum *= 10;
+                sum += parsical::str::parseDigit(stream);
+            } catch (parsical::ParseError& e) {
+                sum /= 10;
+                break;
+            }
+        }
+
+        return sum * sign;
+    });
 }
 
 // A set of basic functions to infer properties about specific characters.

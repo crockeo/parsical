@@ -35,8 +35,21 @@ namespace parsical {
         // of characters.
         std::string takeUntil(parsical::ParseStream<char>&, std::function<bool(char)>);
 
-        // Attempting to parse a bool out of a ParseStream.
+        // Consuming all whitespace from the current position until the
+        // whitespace stops.
+        void consumeWhitespace(parsical::ParseStream<char>&);
+
+        // Attempting to parse a bool out of a ParseStream. Does not consume any
+        // input upon failure.
         bool parseBool(parsical::ParseStream<char>&) throw(ParseError);
+
+        // Attempting to parse a single digit out of a ParseStream. Does not
+        // consume any input upon failure.
+        int parseDigit(parsical::ParseStream<char>&) throw(ParseError);
+
+        // Attempting to parse out an entire int - either positive or negative.
+        // Does not consume any input upon failure.
+        int parseInt(parsical::ParseStream<char>&) throw(ParseError);
 
         // A set of basic functions to infer properties about specific characters.
         bool isWhitespace(char);
