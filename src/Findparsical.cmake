@@ -22,7 +22,7 @@ find_library(PARSICAL_LIBRARY
 )
 
 set(PARSICAL_INCLUDE_DIRS ${PARSICAL_INCLUDE_DIR})
-set(PARSICAL_LIBRARIES ${PARSICAL_LIBRARIES})
+set(PARSICAL_LIBRARIES ${PARSICAL_LIBRARY})
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
