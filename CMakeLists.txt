@@ -33,5 +33,9 @@ install(DIRECTORY src/
         DESTINATION include
         FILES_MATCHING PATTERN *.hpp)
 
+install(DIRECTORY src/
+        DESTINATION include
+        FILES_MATCHING PATTERN *.tpp)
+
 install(FILES src/Findparsical.cmake
         DESTINATION "${CMAKE_ROOT}/Modules")
