@@ -3,6 +3,7 @@
 //////////////
 // Includes //
 #include <sstream>
+#include <cmath>
 
 //////////
 // Code //
@@ -115,6 +116,42 @@ int parsical::str::parseInt(parsical::ParseStream<char>& stream) throw(parsical:
         }
 
         return sum * sign;
+    });
+}
+
+// Attempting to parse out an entire float - either positive or
+// negative. Does not consume any input upon failure.
+float parsical::str::parseFloat(ParseStream<char>& stream) throw(parsical::ParseError) {
+    return parsical::tryParse<float>(stream, [](ParseStream<char>& stream) -> float {
+        int sign = stream.peek() == '-' ? -1 : 1;
+        if (sign == -1)
+            stream.get();
+
+        std::vector<char> number = parsical::takeWhile(stream, isNumber);
+        std::vector<char> decimal;
+        if (!stream.eof() && stream.peek() == '.') {
+            stream.get();
+            decimal = parsical::takeWhile(stream, isNumber);
+        }
+
+        if (!stream.eof() && stream.peek() == 'f')
+            stream.get();
+
+        float nAccum = 0.f;
+        for (char c: number) {
+            nAccum *= 10;
+            nAccum += c - '0';
+        }
+
+        float dAccum = 0.f;
+        for (char c: decimal) {
+            dAccum *= 10;
+            dAccum += c - '0';
+        }
+
+        dAccum /= pow(10.f, decimal.size());
+
+        return sign * (nAccum + dAccum);
     });
 }
 

@@ -55,6 +55,10 @@ namespace parsical {
         // Does not consume any input upon failure.
         int parseInt(ParseStream<char>&) throw(ParseError);
 
+        // Attempting to parse out an entire float - either positive or
+        // negative. Does not consume any input upon failure.
+        float parseFloat(ParseStream<char>&) throw(ParseError);
+
         // A set of basic functions to infer properties about specific characters.
         bool isWhitespace(char);
         bool isNumber(char);

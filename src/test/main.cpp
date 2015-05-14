@@ -315,6 +315,7 @@ TEST_CASE("parseDigit") {
         REQUIRE(parsical::str::parseDigit(p) == i);
 }
 
+// Testing the parseString function.
 TEST_CASE("parseString") {
     parsical::StringParser p("testing some stuff");
 
@@ -349,6 +350,17 @@ TEST_CASE("parseInt") {
     REQUIRE(parsical::str::parseInt(fourth) == -1234);
 }
 
+// Testing the parseFloat function.
+TEST_CASE("parseFloat") {
+    parsical::StringParser first("1234.1234f");
+    REQUIRE(parsical::str::parseFloat(first) == 1234.1234f);
+
+    parsical::StringParser second("-1234.1234f");
+    REQUIRE(parsical::str::parseFloat(second) == -1234.1234f);
+
+    parsical::StringParser third("1234");
+    REQUIRE(parsical::str::parseFloat(third) == 1234);
+}
 
 // Testing the various is____(char) functions.
 TEST_CASE("isChar") {
