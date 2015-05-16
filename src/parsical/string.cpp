@@ -128,14 +128,21 @@ float parsical::str::parseFloat(ParseStream<char>& stream) throw(parsical::Parse
             stream.get();
 
         std::vector<char> number = parsical::takeWhile(stream, isNumber);
+        if (number.size() == 0)
+            throw parsical::ParseError("Expected the first half of a float.");
+
         std::vector<char> decimal;
+        bool dec = false;
         if (!stream.eof() && stream.peek() == '.') {
+            dec = true;
             stream.get();
             decimal = parsical::takeWhile(stream, isNumber);
         }
 
         if (!stream.eof() && stream.peek() == 'f')
             stream.get();
+        else if (dec && decimal.size() == 0)
+            throw parsical::ParseError("Expected the second half of a float.");
 
         float nAccum = 0.f;
         for (char c: number) {

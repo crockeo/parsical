@@ -360,6 +360,13 @@ TEST_CASE("parseFloat") {
 
     parsical::StringParser third("1234");
     REQUIRE(parsical::str::parseFloat(third) == 1234);
+
+    parsical::StringParser last("1. .0f");
+    REQUIRE_THROWS(parsical::str::parseFloat(last));
+    parsical::str::parseString(last);
+    parsical::str::consumeWhitespace(last);
+
+    REQUIRE_THROWS(parsical::str::parseFloat(last));
 }
 
 // Testing the various is____(char) functions.

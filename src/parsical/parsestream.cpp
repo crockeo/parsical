@@ -45,6 +45,7 @@ parsical::IStreamParser::IStreamParser(std::istream* in) throw(std::runtime_erro
     if (!in->good())
         throw std::runtime_error("Input stream is not good.");
 
+    fromRef = false;
     this->in = in;
     in->get(next);
     p = 0;
@@ -52,7 +53,9 @@ parsical::IStreamParser::IStreamParser(std::istream* in) throw(std::runtime_erro
 
 // Creating an IStreamParser from an l-value reference istream.
 parsical::IStreamParser::IStreamParser(std::istream& in) throw(std::runtime_error) :
-        parsical::IStreamParser(&in) { }
+        parsical::IStreamParser(&in) {
+    fromRef = true;
+}
 
 // Creating an IStreamParser from a path to a file on the filesystem.
 parsical::IStreamParser::IStreamParser(std::string path) throw(std::runtime_error) :
@@ -60,7 +63,8 @@ parsical::IStreamParser::IStreamParser(std::string path) throw(std::runtime_erro
 
 // Cleaning up after this parser.
 parsical::IStreamParser::~IStreamParser() {
-    delete in;
+    if (!fromRef)
+        delete in;
 }
 
 // Checking whether this ParseStream has reached its end.

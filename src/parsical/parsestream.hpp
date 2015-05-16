@@ -78,6 +78,7 @@ namespace parsical {
     private:
         std::stack<char> gotten;
         std::istream* in;
+        bool fromRef;
         char next;
         int p;
 
