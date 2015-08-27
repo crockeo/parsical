@@ -26,6 +26,6 @@ set(PARSICAL_LIBRARIES ${PARSICAL_LIBRARY})
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
-  CLIBGAME
+  PARSICAL
   REQUIRED_VARS CLIBGAME_INCLUDE_DIR CLIBGAME_LIBRARY
 )
